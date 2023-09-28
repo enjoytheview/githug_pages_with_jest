@@ -1,0 +1,40 @@
+name: Automation Job
+on:
+  workflow_dispatch:
+
+jobs:
+  job1:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3 
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    - name: Install dependencies
+      run: npm install
+    - name: Run tests
+      run: npm run test
+    - name: Setup Pages
+      uses: actions/configure-pages@v2
+      if: success() || failure()
+    - name: Upload artifact for github pages
+      uses: actions/upload-pages-artifact@v1
+      if: success() || failure()
+      with:
+        path: test-reports/
+  deploy:
+    if: success() || failure()
+    needs: job1
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

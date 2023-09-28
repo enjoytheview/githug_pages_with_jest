@@ -1,0 +1,4 @@
+junit.xml
+test-reports/
+package-lock.json
+node_modules/
